@@ -1,0 +1,490 @@
+<!doctype html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <title>DISC Assessment Tools</title>
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --blue-light: #eff6ff;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-400: #9ca3af;
+      --gray-600: #4b5563;
+      --gray-900: #111827;
+      --d-color: #ef4444;
+      --i-color: #f59e0b;
+      --s-color: #10b981;
+      --c-color: #3b82f6;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+    }
+    header.topbar {
+      background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+      color: #fff;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    header.topbar h1 { font-size: 18px; margin: 0; font-weight: 700; }
+    header.topbar .sub { font-size: 12px; opacity: .85; margin-top: 2px; }
+    nav.tabs { display: flex; gap: 4px; background: rgba(255,255,255,.15); padding: 4px; border-radius: 8px; }
+    nav.tabs button {
+      border: none; background: transparent; color: #fff; padding: 8px 16px;
+      border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 600;
+    }
+    nav.tabs button.active { background: #fff; color: var(--blue-dark); }
+    main { max-width: 880px; margin: 0 auto; padding: 24px 16px 64px; }
+    .card {
+      background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+      padding: 24px; margin-bottom: 20px;
+    }
+    .card h2 { margin-top: 0; font-size: 18px; }
+    .hidden { display: none !important; }
+    label { font-size: 13px; font-weight: 600; color: var(--gray-600); display: block; margin-bottom: 4px; }
+    input[type=text], input[type=email], input[type=number], select {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--gray-200); border-radius: 8px;
+      font-size: 14px; margin-bottom: 14px; font-family: inherit;
+    }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+    @media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } }
+    .qcard {
+      border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 14px;
+    }
+    .qcard .qno { font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
+    .qtable { width: 100%; border-collapse: collapse; }
+    .qtable th { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: .04em; text-align: center; padding-bottom: 6px; width: 60px; }
+    .qtable td { padding: 6px 4px; font-size: 14px; border-top: 1px solid var(--gray-100); }
+    .qtable td.radiocell { text-align: center; }
+    .qtable input[type=radio] { width: 18px; height: 18px; cursor: pointer; }
+    .progress-wrap { position: sticky; top: 0; background: var(--gray-50); padding: 10px 0; z-index: 5; }
+    .progress-bar { height: 8px; background: var(--gray-200); border-radius: 99px; overflow: hidden; }
+    .progress-bar > div { height: 100%; background: var(--blue); width: 0%; transition: width .2s; }
+    .progress-label { font-size: 12px; color: var(--gray-600); margin-bottom: 6px; }
+    button.primary {
+      background: var(--blue); color: #fff; border: none; padding: 12px 22px; border-radius: 8px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+    button.primary:disabled { opacity: .5; cursor: not-allowed; }
+    button.secondary {
+      background: #fff; color: var(--blue); border: 1px solid var(--blue); padding: 8px 16px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .error-box { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .result-hero { text-align: center; padding: 8px 0 20px; }
+    .result-hero .type-code { font-size: 13px; letter-spacing: .1em; color: var(--blue); font-weight: 700; }
+    .result-hero .type-name { font-size: 28px; font-weight: 800; margin: 4px 0 10px; }
+    .bar-row { display: grid; grid-template-columns: 140px 1fr 40px; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .bar-row .lab { font-size: 13px; font-weight: 700; }
+    .bar-track { position: relative; height: 20px; background: var(--gray-100); border-radius: 6px; overflow: hidden; }
+    .bar-track .zero-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--gray-400); }
+    .bar-track .fill { position: absolute; top: 0; bottom: 0; border-radius: 6px; }
+    .bar-row .val { font-size: 13px; font-weight: 700; text-align: right; }
+
+    table.mini { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+    table.mini th { background: var(--gray-100); padding: 6px 8px; text-align: left; }
+    table.mini td { padding: 6px 8px; border-bottom: 1px solid var(--gray-100); }
+    .tip-box { background: var(--blue-light); border-left: 4px solid var(--blue); padding: 14px 16px; border-radius: 6px; font-size: 14px; margin: 14px 0; }
+    ul.train-list { padding-left: 20px; }
+    ul.train-list li { margin-bottom: 6px; font-size: 14px; }
+
+    .admin-table-wrap { overflow-x: auto; }
+    table.admin { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
+    table.admin th { background: var(--gray-100); padding: 8px; text-align: left; position: sticky; top: 0; }
+    table.admin td { padding: 8px; border-bottom: 1px solid var(--gray-100); white-space: nowrap; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; background: var(--blue-light); color: var(--blue-dark); }
+    .stat-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .stat-tile { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 12px 16px; min-width: 90px; }
+    .stat-tile .n { font-size: 22px; font-weight: 800; }
+    .stat-tile .l { font-size: 11px; color: var(--gray-600); }
+    footer { text-align: center; font-size: 12px; color: var(--gray-400); padding: 20px; }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div>
+      <h1>DISC Assessment Tools</h1>
+      <div class="sub">Tes kepribadian DISC online &middot; hasil instan &middot; rekomendasi training karier</div>
+    </div>
+    <nav class="tabs">
+      <button id="tab-test" class="active" onclick="showView('test')">Ambil Tes</button>
+      <button id="tab-admin" onclick="showView('admin')">Admin</button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ============== VIEW: TEST ============== -->
+    <div id="view-test">
+      <div class="card" id="biodata-card">
+        <h2>Data Peserta</h2>
+        <div id="biodata-error" class="error-box hidden"></div>
+        <div class="grid2">
+          <div>
+            <label>Nama Lengkap *</label>
+            <input type="text" id="f-nama" placeholder="Nama Anda">
+          </div>
+          <div>
+            <label>Email *</label>
+            <input type="email" id="f-email" placeholder="nama@email.com">
+          </div>
+          <div>
+            <label>Usia *</label>
+            <input type="number" id="f-usia" min="10" max="100" placeholder="contoh: 28">
+          </div>
+          <div>
+            <label>Jenis Kelamin *</label>
+            <select id="f-gender">
+              <option value="">Pilih...</option>
+              <option value="Laki-laki">Laki-laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
+          </div>
+          <div style="grid-column:1/-1;">
+            <label>Jabatan / Departemen (opsional)</label>
+            <input type="text" id="f-jabatan" placeholder="contoh: Staff Marketing">
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--gray-600);">
+          <b>Instruksi:</b> Setiap nomor berisi 4 kalimat. Untuk setiap nomor, beri tanda pada kolom
+          <b>P</b> (Paling menggambarkan diri Anda) di satu kalimat, dan kolom <b>K</b> (Paling TIDAK
+          menggambarkan diri Anda) di kalimat yang lain. Setiap nomor wajib punya 1 tanda P dan 1 tanda K
+          yang berbeda kalimat.
+        </p>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-label" id="progress-label">0 dari 24 soal terisi lengkap</div>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+      </div>
+
+      <div id="questions-container"><p style="color:var(--gray-400);">Memuat soal...</p></div>
+
+      <div class="card" style="text-align:center;">
+        <div id="submit-error" class="error-box hidden"></div>
+        <button class="primary" id="btn-submit" onclick="submitTest()" disabled>Kirim &amp; Lihat Hasil</button>
+      </div>
+    </div>
+
+    <!-- ============== VIEW: RESULT ============== -->
+    <div id="view-result" class="hidden">
+      <div class="card">
+        <div class="result-hero">
+          <div class="type-code" id="res-code"></div>
+          <div class="type-name" id="res-name"></div>
+          <div id="res-email-status" style="font-size:13px;color:var(--gray-600);"></div>
+        </div>
+        <div id="res-bars"></div>
+        <table class="mini" id="res-table"></table>
+      </div>
+      <div class="card">
+        <h2>Deskripsi Kepribadian</h2>
+        <p id="res-desc"></p>
+      </div>
+      <div class="card">
+        <h2>Rekomendasi Training untuk Sukses Karier</h2>
+        <p id="res-train-summary" style="color:var(--gray-600);"></p>
+        <ul class="train-list" id="res-train-list"></ul>
+        <div class="tip-box" id="res-train-tip"></div>
+      </div>
+      <div class="card">
+        <h2>Area Karier yang Cocok</h2>
+        <p id="res-career" style="font-size:13px;color:var(--gray-600);"></p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <button class="secondary" onclick="location.reload()">Isi Tes Baru</button>
+      </div>
+    </div>
+
+    <!-- ============== VIEW: ADMIN ============== -->
+    <div id="view-admin" class="hidden">
+      <div class="card" id="admin-login-card">
+        <h2>Login Admin</h2>
+        <div id="admin-error" class="error-box hidden"></div>
+        <label>Password Admin</label>
+        <input type="text" id="admin-password" placeholder="Masukkan password admin" onkeydown="if(event.key==='Enter')adminLogin()">
+        <button class="primary" onclick="adminLogin()">Masuk</button>
+      </div>
+
+      <div id="admin-dashboard" class="hidden">
+        <div class="card">
+          <h2>Rekap Hasil Tes DISC</h2>
+          <div class="stat-row" id="admin-stats"></div>
+          <div class="admin-table-wrap">
+            <table class="admin" id="admin-table">
+              <thead>
+                <tr>
+                  <th>Waktu</th><th>Nama</th><th>Email</th><th>Jabatan</th>
+                  <th>Tipe</th><th>Kode</th><th>Email Terkirim</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>DISC Assessment Tools &mdash; diadaptasi dari DISC Master System</footer>
+
+<script>
+  var QUESTIONS = [];
+  var adminToken = null;
+
+  function showView(name) {
+    ['test', 'admin'].forEach(function (v) {
+      document.getElementById('tab-' + v).classList.toggle('active', v === name);
+    });
+    document.getElementById('view-test').classList.toggle('hidden', name !== 'test');
+    document.getElementById('view-admin').classList.toggle('hidden', name !== 'admin');
+    document.getElementById('view-result').classList.add('hidden');
+    if (name === 'test' && QUESTIONS.length === 0) loadQuestions();
+  }
+
+  // ---------------- LOAD QUESTIONS ----------------
+  function loadQuestions() {
+    google.script.run.withSuccessHandler(function (qs) {
+      QUESTIONS = qs;
+      renderQuestions();
+    }).withFailureHandler(function (err) {
+      document.getElementById('questions-container').innerHTML =
+        '<div class="error-box">Gagal memuat soal: ' + (err.message || err) + '</div>';
+    }).getQuestionsForClient();
+  }
+
+  function renderQuestions() {
+    var container = document.getElementById('questions-container');
+    var html = '';
+    QUESTIONS.forEach(function (q) {
+      html += '<div class="qcard" data-qno="' + q.no + '">';
+      html += '<div class="qno">Nomor ' + q.no + '</div>';
+      html += '<table class="qtable"><tr><th></th><th>P</th><th>K</th></tr>';
+      q.statements.forEach(function (text, i) {
+        var pos = i + 1;
+        html += '<tr>' +
+          '<td>' + text + '</td>' +
+          '<td class="radiocell"><input type="radio" name="most-' + q.no + '" value="' + pos + '" onchange="onAnswerChange(' + q.no + ')"></td>' +
+          '<td class="radiocell"><input type="radio" name="least-' + q.no + '" value="' + pos + '" onchange="onAnswerChange(' + q.no + ')"></td>' +
+          '</tr>';
+      });
+      html += '</table></div>';
+    });
+    container.innerHTML = html;
+    updateProgress();
+  }
+
+  function onAnswerChange(qno) {
+    var mostVal = getChecked('most-' + qno);
+    var leastVal = getChecked('least-' + qno);
+    var qcard = document.querySelector('.qcard[data-qno="' + qno + '"]');
+    var errEl = qcard.querySelector('.q-inline-error');
+    if (mostVal && leastVal && mostVal === leastVal) {
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.className = 'q-inline-error';
+        errEl.style.cssText = 'color:#b91c1c;font-size:12px;margin-top:6px;';
+        errEl.textContent = 'Pilihan P dan K tidak boleh sama.';
+        qcard.appendChild(errEl);
+      }
+    } else if (errEl) {
+      errEl.remove();
+    }
+    updateProgress();
+  }
+
+  function getChecked(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : null;
+  }
+
+  function updateProgress() {
+    var done = 0;
+    QUESTIONS.forEach(function (q) {
+      var m = getChecked('most-' + q.no);
+      var l = getChecked('least-' + q.no);
+      if (m && l && m !== l) done++;
+    });
+    var total = QUESTIONS.length || 24;
+    document.getElementById('progress-label').textContent = done + ' dari ' + total + ' soal terisi lengkap';
+    document.getElementById('progress-fill').style.width = (done / total * 100) + '%';
+    document.getElementById('btn-submit').disabled = done !== total;
+  }
+
+  // ---------------- SUBMIT ----------------
+  function submitTest() {
+    var errBox = document.getElementById('submit-error');
+    var bioErrBox = document.getElementById('biodata-error');
+    errBox.classList.add('hidden');
+    bioErrBox.classList.add('hidden');
+
+    var participant = {
+      nama: document.getElementById('f-nama').value.trim(),
+      email: document.getElementById('f-email').value.trim(),
+      usia: document.getElementById('f-usia').value,
+      jenisKelamin: document.getElementById('f-gender').value,
+      jabatan: document.getElementById('f-jabatan').value.trim()
+    };
+    if (!participant.nama || !participant.email || !participant.usia || !participant.jenisKelamin) {
+      bioErrBox.textContent = 'Mohon lengkapi Nama, Email, Usia, dan Jenis Kelamin.';
+      bioErrBox.classList.remove('hidden');
+      document.getElementById('biodata-card').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+
+    var answers = QUESTIONS.map(function (q) {
+      return { no: q.no, mostPos: Number(getChecked('most-' + q.no)), leastPos: Number(getChecked('least-' + q.no)) };
+    });
+
+    var btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Mengirim...';
+
+    google.script.run.withSuccessHandler(function (res) {
+      renderResult(res);
+      showResultView();
+    }).withFailureHandler(function (err) {
+      btn.disabled = false;
+      btn.textContent = 'Kirim & Lihat Hasil';
+      errBox.textContent = 'Gagal mengirim: ' + (err.message || err);
+      errBox.classList.remove('hidden');
+    }).submitTest({ participant: participant, answers: answers });
+  }
+
+  function showResultView() {
+    document.getElementById('view-test').classList.add('hidden');
+    document.getElementById('view-admin').classList.add('hidden');
+    document.getElementById('view-result').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+
+  var LETTER_LABEL = { D: 'D - Dominance', I: 'I - Influence', S: 'S - Steadiness', C: 'C - Conscientiousness' };
+  var LETTER_COLOR = { D: '#ef4444', I: '#f59e0b', S: '#10b981', C: '#3b82f6' };
+
+  function renderResult(res) {
+    var scoring = res.scoring;
+    var def = scoring.defEntry;
+    document.getElementById('res-code').textContent = 'KODE TIPE: ' + scoring.code;
+    document.getElementById('res-name').textContent = def ? def.name : '-';
+    document.getElementById('res-email-status').textContent = res.emailSent
+      ? 'Hasil lengkap telah dikirim ke ' + res.participant.email
+      : 'Hasil tersimpan, namun pengiriman email gagal. Hubungi admin.';
+
+    var barsHtml = '';
+    ['D', 'I', 'S', 'C'].forEach(function (letter) {
+      var v = scoring.result[letter];
+      var pct = Math.min(Math.abs(v) / 24 * 100, 50);
+      var left = v >= 0 ? '50%' : (50 - pct) + '%';
+      barsHtml += '<div class="bar-row">' +
+        '<div class="lab" style="color:' + LETTER_COLOR[letter] + ';">' + LETTER_LABEL[letter] + '</div>' +
+        '<div class="bar-track"><div class="zero-line"></div><div class="fill" style="left:' + left + ';width:' + pct + '%;background:' + LETTER_COLOR[letter] + ';"></div></div>' +
+        '<div class="val">' + v + '</div>' +
+        '</div>';
+    });
+    document.getElementById('res-bars').innerHTML = barsHtml;
+
+    var tableHtml = '<tr><th>Faktor</th><th>Paling (Most)</th><th>Paling Tidak (Least)</th><th>Hasil</th></tr>';
+    ['D', 'I', 'S', 'C'].forEach(function (letter) {
+      tableHtml += '<tr><td>' + LETTER_LABEL[letter] + '</td><td>' + scoring.most[letter] + '</td><td>' + scoring.least[letter] + '</td><td><b>' + scoring.result[letter] + '</b></td></tr>';
+    });
+    document.getElementById('res-table').innerHTML = tableHtml;
+
+    document.getElementById('res-desc').textContent = def ? def.desc : '';
+    document.getElementById('res-career').textContent = def ? def.career : '';
+
+    var training = res.training;
+    document.getElementById('res-train-summary').textContent = training.summary + ' Area pengembangan: ' + training.growthArea;
+    document.getElementById('res-train-list').innerHTML = training.trainings.map(function (t) { return '<li>' + t + '</li>'; }).join('');
+    document.getElementById('res-train-tip').textContent = training.tip;
+  }
+
+  // ---------------- ADMIN ----------------
+  function adminLogin() {
+    var pw = document.getElementById('admin-password').value;
+    var errBox = document.getElementById('admin-error');
+    errBox.classList.add('hidden');
+    google.script.run.withSuccessHandler(function (res) {
+      if (!res.ok) {
+        errBox.textContent = res.message || 'Login gagal.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+      adminToken = res.token;
+      document.getElementById('admin-login-card').classList.add('hidden');
+      document.getElementById('admin-dashboard').classList.remove('hidden');
+      loadAdminData();
+    }).withFailureHandler(function (err) {
+      errBox.textContent = err.message || String(err);
+      errBox.classList.remove('hidden');
+    }).adminLogin(pw);
+  }
+
+  function loadAdminData() {
+    google.script.run.withSuccessHandler(function (rows) {
+      renderAdminTable(rows);
+    }).adminGetResponses(adminToken);
+
+    google.script.run.withSuccessHandler(function (summary) {
+      renderAdminStats(summary);
+    }).adminGetSummary(adminToken);
+  }
+
+  function renderAdminStats(summary) {
+    var html = '<div class="stat-tile"><div class="n">' + summary.total + '</div><div class="l">Total Peserta</div></div>';
+    Object.keys(summary.byType).sort(function (a, b) { return summary.byType[b] - summary.byType[a]; }).forEach(function (k) {
+      html += '<div class="stat-tile"><div class="n">' + summary.byType[k] + '</div><div class="l">' + k + '</div></div>';
+    });
+    document.getElementById('admin-stats').innerHTML = html;
+  }
+
+  function renderAdminTable(rows) {
+    var body = document.getElementById('admin-table-body');
+    body.innerHTML = rows.slice().reverse().map(function (r) {
+      return '<tr>' +
+        '<td>' + r.Timestamp + '</td>' +
+        '<td>' + r.Nama + '</td>' +
+        '<td>' + r.Email + '</td>' +
+        '<td>' + (r.Jabatan || '-') + '</td>' +
+        '<td>' + r.NamaTipe + '</td>' +
+        '<td><span class="badge">' + r.KodeTipe + '</span></td>' +
+        '<td>' + r.EmailTerkirim + '</td>' +
+        '<td><button class="secondary" onclick="resendEmail(\'' + r.ResponseId + '\', this)">Kirim Ulang</button></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function resendEmail(responseId, btn) {
+    btn.disabled = true;
+    btn.textContent = '...';
+    google.script.run.withSuccessHandler(function () {
+      btn.textContent = 'Terkirim';
+      loadAdminData();
+    }).withFailureHandler(function (err) {
+      btn.disabled = false;
+      btn.textContent = 'Kirim Ulang';
+      alert('Gagal: ' + (err.message || err));
+    }).adminResendEmail(adminToken, responseId);
+  }
+
+  // init
+  loadQuestions();
+</script>
+</body>
+</html>
