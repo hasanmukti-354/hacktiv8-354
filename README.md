@@ -21,7 +21,7 @@ python3 -m http.server 8080
 
 ## Cara mengganti aset placeholder
 
-1. **Foto profil** — cari komentar `Placeholder — ganti dengan foto profesional` di `index.html` (bagian Hero & Tentang). Ganti elemen `.hero__avatar` / `.about__avatar` dengan tag `<img>` yang mengarah ke foto asli, lalu sesuaikan ukuran di `style.css` bila perlu.
+1. **Foto profil** — sudah terpasang di `assets/img/hasan-mukti-profile.png`, dipakai di section Hero (`.hero__avatar`) & Tentang (`.about__avatar`). File yang terpasang saat ini beresolusi kecil (84×112px) — ganti file tersebut dengan foto resolusi lebih tinggi (disarankan minimal 400×400px, format persegi) kapan pun tersedia, nama file & path bisa tetap sama.
 2. **Logo klien** — ganti isi `.marquee__track` (list `<span class="logo-pill">`) dengan `<img>` logo klien asli.
 3. **Testimoni** — ganti teks di section `#testimoni` (ditandai sebagai contoh/placeholder) dengan testimoni asli klien.
 4. **Nomor WhatsApp / Email** — cukup ubah 3 variabel di awal `assets/js/main.js`:
